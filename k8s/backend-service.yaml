@@ -1,0 +1,14 @@
+# ClusterIP service gives the frontend and ingress a stable backend DNS name.
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-backend
+  namespace: order-system
+spec:
+  type: ClusterIP
+  selector:
+    app: order-backend
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000

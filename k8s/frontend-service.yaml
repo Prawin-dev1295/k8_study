@@ -1,0 +1,14 @@
+# ClusterIP service exposes frontend pods inside the cluster for ingress.
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-frontend
+  namespace: order-system
+spec:
+  type: ClusterIP
+  selector:
+    app: order-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80

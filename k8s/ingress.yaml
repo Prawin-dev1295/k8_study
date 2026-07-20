@@ -1,0 +1,19 @@
+# Ingress exposes the React frontend to a browser.
+# Enable an ingress controller first, such as minikube addons enable ingress.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: order-ingress
+  namespace: order-system
+spec:
+  rules:
+    - host: order.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: order-frontend
+                port:
+                  number: 80

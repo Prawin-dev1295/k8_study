@@ -1,0 +1,52 @@
+# Deployment runs three backend API replicas.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-backend
+  namespace: order-system
+  labels:
+    app: order-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: order-backend
+  template:
+    metadata:
+      labels:
+        app: order-backend
+    spec:
+      containers:
+        - name: backend
+          image: order-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: order-backend-config
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: order-postgres-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: order-postgres-secret
+                  key: password
+          # Liveness restarts a stuck API container.
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          # Readiness prevents traffic until the API and database are available.
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10

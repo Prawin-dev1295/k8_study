@@ -1,0 +1,29 @@
+# CloudNativePG Cluster creates one primary PostgreSQL pod and two replicas.
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: order-postgres
+  namespace: order-system
+spec:
+  instances: 3
+
+  # Persistent storage is created as PVCs, one per PostgreSQL instance.
+  storage:
+    size: 1Gi
+
+  # The read/write service is generated as order-postgres-rw.
+  bootstrap:
+    initdb:
+      database: orderdb
+      owner: orderuser
+      secret:
+        name: order-postgres-secret
+
+  # A small resource profile works well for minikube and kind demos.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

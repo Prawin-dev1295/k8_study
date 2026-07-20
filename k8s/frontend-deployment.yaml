@@ -1,0 +1,41 @@
+# Deployment runs four frontend replicas behind Nginx.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-frontend
+  namespace: order-system
+  labels:
+    app: order-frontend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: order-frontend
+  template:
+    metadata:
+      labels:
+        app: order-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: order-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: API_BASE_URL
+              value: /api
+          # Liveness checks that Nginx is serving the React bundle.
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          # Readiness keeps pods out of service until Nginx responds.
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10

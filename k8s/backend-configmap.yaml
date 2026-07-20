@@ -1,0 +1,11 @@
+# ConfigMap stores non-sensitive backend configuration.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-backend-config
+  namespace: order-system
+data:
+  PORT: "5000"
+  DB_HOST: order-postgres-rw
+  DB_PORT: "5432"
+  DB_NAME: orderdb
