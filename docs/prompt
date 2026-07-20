@@ -1,0 +1,196 @@
+Create a complete Kubernetes learning project with the following architecture:
+
+* Frontend: React application for an order purchasing webpage
+* Backend: Node.js with Express.js REST API
+* Database: PostgreSQL
+* Kubernetes deployment:
+    * 4 frontend replicas
+    * 3 backend replicas
+    * 3 PostgreSQL database instances using PostgreSQL replication/operator approach
+* All setup steps, commands, architecture explanation, and deployment instructions must be added clearly in the README.md file.
+
+Project requirement:
+
+Build a simple Order Purchasing System.
+
+Frontend requirement:
+
+* Use React.
+* Create a clean order purchasing webpage.
+* User should be able to:
+    * View available products
+    * Add products to order
+    * Enter customer name
+    * Submit order
+    * View submitted orders
+* Frontend should call backend API.
+* Use environment variable for backend API URL.
+* Frontend should be containerized using Docker.
+* Frontend should run behind Nginx inside the container.
+* Kubernetes frontend deployment must run 4 replicas.
+
+Backend requirement:
+
+* Use Node.js with Express.js.
+* Create REST APIs:
+    * GET /api/health
+    * GET /api/products
+    * POST /api/orders
+    * GET /api/orders
+* Backend should connect to PostgreSQL.
+* Use environment variables for database connection:
+    * DB_HOST
+    * DB_PORT
+    * DB_NAME
+    * DB_USER
+    * DB_PASSWORD
+* Backend should create required tables automatically on startup if they do not exist.
+* Tables required:
+    * products
+    * orders
+    * order_items
+* Insert default product data if products table is empty.
+* Backend should be containerized using Docker.
+* Kubernetes backend deployment must run 3 replicas.
+
+Database requirement:
+
+* Use PostgreSQL.
+* Use CloudNativePG operator or a similar open-source PostgreSQL operator for Kubernetes.
+* Create PostgreSQL cluster with 3 instances.
+* Use one primary and two replica instances.
+* Use persistent storage with PVC.
+* Backend should connect to the read/write database service.
+* Add Kubernetes Secret for database username and password.
+
+Kubernetes requirement:
+Create Kubernetes manifests under a k8s/ folder.
+
+Required manifests:
+
+* namespace.yaml
+* frontend-deployment.yaml
+* frontend-service.yaml
+* backend-deployment.yaml
+* backend-service.yaml
+* postgres-secret.yaml
+* postgres-cluster.yaml
+* ingress.yaml if applicable
+* configmap.yaml if needed
+
+Expected Kubernetes design:
+
+* Frontend Deployment: 4 replicas
+* Backend Deployment: 3 replicas
+* PostgreSQL Cluster: 3 instances
+* Frontend Service exposes frontend internally
+* Backend Service exposes backend internally
+* Ingress or NodePort should allow browser access to frontend
+* Frontend should communicate with backend service
+* Backend should communicate with PostgreSQL read/write service
+
+Docker requirement:
+Create Dockerfiles for both frontend and backend.
+
+Project structure should be:
+
+order-purchase-k8s/
+├── frontend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── src/
+│   └── nginx.conf
+├── backend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── server.js
+│   └── db.js
+├── k8s/
+│   ├── namespace.yaml
+│   ├── frontend-deployment.yaml
+│   ├── frontend-service.yaml
+│   ├── backend-deployment.yaml
+│   ├── backend-service.yaml
+│   ├── postgres-secret.yaml
+│   ├── postgres-cluster.yaml
+│   └── ingress.yaml
+└── README.md
+
+README.md requirement:
+Add very detailed documentation including:
+
+1. Project overview
+2. Architecture diagram using text
+3. Technology stack
+4. Folder structure
+5. Prerequisites
+6. Local development setup
+7. Docker build commands
+8. Kubernetes setup commands
+9. CloudNativePG operator installation command
+10. PostgreSQL cluster deployment command
+11. Frontend/backend deployment command
+12. Commands to verify pods, services, deployments, PVC, and PostgreSQL cluster
+13. Commands to check logs
+14. Commands to scale frontend/backend
+15. Commands to test API
+16. How frontend connects to backend
+17. How backend connects to PostgreSQL
+18. How 3 database instances work with primary and replicas
+19. How to test database failover
+20. Cleanup commands
+
+Use these example commands in README.md:
+
+kubectl create namespace order-system
+
+kubectl apply –server-side -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.27/releases/cnpg-1.27.0.yaml
+
+kubectl apply -f k8s/
+
+kubectl get pods -n order-system
+
+kubectl get deployments -n order-system
+
+kubectl get svc -n order-system
+
+kubectl get pvc -n order-system
+
+kubectl get cluster -n order-system
+
+kubectl logs -n order-system deployment/backend
+
+kubectl logs -n order-system deployment/frontend
+
+kubectl scale deployment frontend -n order-system –replicas=4
+
+kubectl scale deployment backend -n order-system –replicas=3
+
+kubectl delete pod  -n order-system
+
+Important implementation notes:
+
+* Do not hardcode database passwords in application code.
+* Use Kubernetes Secret for database credentials.
+* Make the app simple but complete and runnable.
+* Add comments in Kubernetes YAML files explaining each section.
+* Add simple error handling in backend.
+* Add CORS support in backend.
+* Add health check endpoint.
+* Add readiness and liveness probes for frontend and backend.
+* Use clear naming:
+    * namespace: order-system
+    * frontend deployment: order-frontend
+    * backend deployment: order-backend
+    * database cluster: order-postgres
+    * database name: orderdb
+    * database user: orderuser
+
+Final expected output:
+
+* Full working source code
+* Dockerfiles
+* Kubernetes YAML manifests
+* README.md with all commands and setup explanation
+* The project should be runnable on minikube or kind
+* The final application should allow users to create and view purchase orders from the React UI, store the order data in PostgreSQL, and run in Kubernetes with 4 frontend pods, 3 backend pods, and 3 PostgreSQL database instances.
