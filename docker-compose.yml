@@ -16,5 +16,48 @@ services:
       timeout: 5s
       retries: 10
 
+  order-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: order-backend:latest
+    container_name: order-backend
+    environment:
+      PORT: 5000
+      DB_HOST: order-postgres-local
+      DB_PORT: 5432
+      DB_NAME: orderdb
+      DB_USER: orderuser
+      DB_PASSWORD: orderpassword
+    ports:
+      - "5001:5000"
+    depends_on:
+      order-postgres-local:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:5000/api/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  order-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: order-frontend:latest
+    container_name: order-frontend
+    environment:
+      API_BASE_URL: /api
+    ports:
+      - "8080:80"
+    depends_on:
+      order-backend:
+        condition: service_healthy
+
 volumes:
   order-postgres-local-data:
